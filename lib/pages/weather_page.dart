@@ -18,11 +18,17 @@ class _WeatherPageState extends State<WeatherPage> {
   final DioClient _dioClient =
       DioClient(apiKey: '5f7a88034e7692b2315dedae95c18e42', dioClient: Dio());
   WeatherModel? _weather;
+  final TextEditingController _cityController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    fetchWeather();
+    // Inicialmente, buscar clima para a cidade atual
+    _dioClient.getCurrentCity().then((cityName) {
+      _cityController.text =
+          cityName; // Atualiza o campo de texto com a cidade atual
+      fetchWeatherFromCurrentCity(cityName);
+    });
   }
 
   // Animacoes do clima
@@ -51,8 +57,8 @@ class _WeatherPageState extends State<WeatherPage> {
     }
   }
 
-  // Buscar clima
-  Future<void> fetchWeather() async {
+  // Buscar clima da cidade atual
+  Future<void> fetchWeatherFromCurrentCity(String cityName) async {
     try {
       // Pegar a cidade atual
       String cityName = await _dioClient.getCurrentCity();
@@ -71,14 +77,60 @@ class _WeatherPageState extends State<WeatherPage> {
     }
   }
 
+  // Buscar clima da cidade digitada
+  Future<void> fetchWeatherFromTypedCity(String cityName) async {
+    try {
+      // Pegar a cidade atual
+      String cityName = _cityController.text;
+      if (cityName == 'Unknown' || cityName.isEmpty || cityName == '') {
+        print('Nome da cidade inválido.');
+        return;
+      }
+      print('Cidade Digitada: $cityName');
+      // Buscar o clima da cidade
+      final weather = await _dioClient.getWeather(cityName: cityName);
+      setState(() {
+        _weather = weather;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[600],
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 72.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Padding(
+              padding:
+                  const EdgeInsets.only(right: 24.0, left: 24.0, bottom: 48.0),
+              child: TextField(
+                controller: _cityController,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.grey[500],
+                  hintText: 'Enter a city',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  isDense: true,
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: const BorderSide(color: Colors.black),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.search),
+                    onPressed: () {
+                      fetchWeatherFromTypedCity(_cityController.text);
+                    },
+                  ),
+                ),
+              ),
+            ),
             Text(
               _weather?.cityName ?? 'Loading city...',
               style: GoogleFonts.oswald(
@@ -98,7 +150,21 @@ class _WeatherPageState extends State<WeatherPage> {
             ),
             Text(
               _weather?.mainCondition ?? 'Loading...',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Min: ${_weather?.minTemperature.substring(0, 2) ?? 'Loading...'} °C',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  'Max: ${_weather?.maxTemperature.substring(0, 2) ?? 'Loading...'} °C',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
           ],
         ),
