@@ -101,72 +101,74 @@ class _WeatherPageState extends State<WeatherPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[600],
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 72.0),
-        child: Column(
-          children: [
-            Padding(
-              padding:
-                  const EdgeInsets.only(right: 24.0, left: 24.0, bottom: 48.0),
-              child: TextField(
-                controller: _cityController,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.grey[500],
-                  hintText: 'Enter a city',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  isDense: true,
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: const BorderSide(color: Colors.black),
-                  ),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.search),
-                    onPressed: () {
-                      fetchWeatherFromTypedCity(_cityController.text);
-                    },
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 72.0),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(
+                    right: 24.0, left: 24.0, bottom: 48.0),
+                child: TextField(
+                  controller: _cityController,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey[500],
+                    hintText: 'Enter a city',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    isDense: true,
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(color: Colors.black),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () {
+                        fetchWeatherFromTypedCity(_cityController.text);
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
-            Text(
-              _weather?.cityName ?? 'Loading city...',
-              style: GoogleFonts.oswald(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            // Animation
-            Lottie.asset(
-                getWeatherAnimation(_weather?.mainCondition.toLowerCase())),
-            Text(
-              '${_weather?.temperature.round() ?? ''} °C',
-              style: GoogleFonts.oswald(
-                fontSize: 40,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              _weather?.mainCondition ?? 'Loading...',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Min: ${_weather?.minTemperature.substring(0, 2) ?? 'Loading...'} °C',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+              Text(
+                _weather?.cityName ?? 'Loading city...',
+                style: GoogleFonts.oswald(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(width: 16),
-                Text(
-                  'Max: ${_weather?.maxTemperature.substring(0, 2) ?? 'Loading...'} °C',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              // Animation
+              Lottie.asset(
+                  getWeatherAnimation(_weather?.mainCondition.toLowerCase())),
+              Text(
+                '${_weather?.temperature.round() ?? ''} °C',
+                style: GoogleFonts.oswald(
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
                 ),
-              ],
-            ),
-          ],
+              ),
+              Text(
+                _weather?.mainCondition ?? 'Loading...',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Min: ${_weather?.minTemperature.substring(0, 2) ?? 'Loading...'} °C',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(width: 16),
+                  Text(
+                    'Max: ${_weather?.maxTemperature.substring(0, 2) ?? 'Loading...'} °C',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
